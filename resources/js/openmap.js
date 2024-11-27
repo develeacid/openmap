@@ -1,8 +1,12 @@
+//openlayer
 import "ol/ol.css";
 import Map from "ol/Map";
 import View from "ol/View";
 import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
+//layerswitcher
+import "ol-layerswitcher/dist/ol-layerswitcher.css";
+import LayerSwitcher from "ol-layerswitcher";
 
 export function inicializarMapa(mapElementId) {
     const map = new Map({
@@ -17,6 +21,12 @@ export function inicializarMapa(mapElementId) {
             zoom: 8,
         }),
     });
+
+    // Agregar LayerSwitcher al mapa
+    var layerSwitcher = new LayerSwitcher({
+        tipLabel: "Leyenda", // Opcional: cambia el texto del tooltip
+    });
+    map.addControl(layerSwitcher);
 
     return map; // Devolver la instancia del mapa
 }

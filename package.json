@@ -12,6 +12,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
-        "ol": "^10.2.1"
+        "ol": "^10.2.1",
+        "ol-layerswitcher": "^4.1.2"
     }
 }
