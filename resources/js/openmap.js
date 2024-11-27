@@ -12,7 +12,11 @@ import { Fill, Stroke, Style } from "ol/style";
 import { useGeographic } from "ol/proj"; // Importar useGeographic
 // LayerSwitcher (asegúrate de tenerlo instalado: npm install ol-layerswitcher)
 import LayerSwitcher from "ol-layerswitcher";
+//suavisar poligonos
 import * as turf from "@turf/turf";
+//efecto hover
+import { pointerMove } from "ol/events/condition";
+import Select from "ol/interaction/Select";
 
 // Usar useGeographic() para coordenadas geográficas (longitud, latitud)
 useGeographic();
@@ -111,6 +115,29 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
                     projection: "EPSG:4326",
                 }),
             });
+
+            // Estilo para el hover
+            const highlightStyle = new Style({
+                fill: new Fill({
+                    color: "rgba(255, 0, 0, 0.3)", // Rojo transparente, ajusta el color a tu gusto
+                }),
+                stroke: new Stroke({
+                    color: "#FF0000", // Rojo, ajusta el color a tu gusto
+                    width: 3,
+                }),
+            });
+
+            // Crear una interacción de selección para el hover.  pointerMove activa la selección al pasar el ratón.
+            const hoverInteraction = new Select({
+                condition: pointerMove,
+                style: highlightStyle, // Usar el estilo highlightStyle para el hover
+                filter: (feature, layer) => {
+                    //Filtrar la capa de municipio
+                    return layer === vectorLayer1;
+                },
+            });
+
+            map.addInteraction(hoverInteraction);
 
             // Layer Switcher
             const layerSwitcher = new LayerSwitcher({
