@@ -1,12 +1,15 @@
 <div>
-  <div id="map" class="map"></div> 
+<div id="map" style="height: 400px; width: 100%;"></div> {{-- Ensure inline styles for height/width --}}
+    
 
-  <script type="module">
-    import { inicializarMapa } from '../../js/openmap.js'; 
-    import '../../css/openmap.css'; 
+<script>
+    let mapInitialized = false;  // Flag to track initialization
 
     document.addEventListener('livewire:load', function () {
-      inicializarMapa('map'); 
+        if (!mapInitialized) {
+            inicializarMapa('map', '{{ asset('oaxacaGeoJson.json') }}');
+            mapInitialized = true;
+        }
     });
-  </script>
+</script>
 </div>
