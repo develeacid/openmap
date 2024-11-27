@@ -10,11 +10,13 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import { Fill, Stroke, Style } from "ol/style";
 import { useGeographic } from "ol/proj"; // Importar useGeographic
+// LayerSwitcher (asegúrate de tenerlo instalado: npm install ol-layerswitcher)
+import LayerSwitcher from "ol-layerswitcher";
 
 // Usar useGeographic() para coordenadas geográficas (longitud, latitud)
 useGeographic();
 
-window.inicializarMapa = function (mapDivId, geoJsonUrl) {
+window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
     // Asegurarse de que el contenedor del mapa tenga dimensiones
     const mapContainer = document.getElementById(mapDivId);
     if (!mapContainer) {
@@ -22,47 +24,96 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
         return; // Detener la ejecución si no se encuentra el contenedor
     }
 
-    fetch(geoJsonUrl)
+    // Promesas para cargar ambos archivos GeoJSON
+    const promesaGeoJSON1 = fetch(geoJsonUrl)
         .then((response) => response.json())
-        .then((geoJsonData) => {
-            // Crear un estilo para la capa GeoJSON
-            const geoJsonStyle = new Style({
+        .catch((error) => {
+            console.error("Error cargando el primer GeoJSON:", error);
+            // Manejar el error, quizás mostrar un mensaje al usuario, etc.
+            // Puedes retornar un valor por defecto o lanzar el error para detener la ejecución
+            //  throw error; // Lanzar el error para detener Promise.all
+            return {}; // O retornar un objeto vacío para que Promise.all continúe
+        });
+
+    const promesaGeoJSON2 = fetch(geoJsonUrl2)
+        .then((response) => response.json())
+        .catch((error) => {
+            console.error("Error cargando el segundo GeoJSON:", error);
+            // Manejar el error similar al anterior
+            return {};
+        });
+
+    Promise.all([promesaGeoJSON1, promesaGeoJSON2])
+        .then(([geoJsonData1, geoJsonData2]) => {
+            // Destructurar los resultados
+
+            // Estilo para la capa GeoJSON 1 (Municipios)
+            const geoJsonStyle1 = new Style({
                 fill: new Fill({
-                    color: "rgba(157, 36, 73, 0.5)", // Relleno semi-transparente
+                    color: "rgba(157, 36, 73, 0.5)",
                 }),
                 stroke: new Stroke({
-                    color: "#9d2449", // Color del borde
-                    width: 2, // Ancho del borde
+                    color: "#9d2449",
+                    width: 2,
                 }),
             });
 
-            // Crear la capa vectorial con los datos GeoJSON y el estilo
-            const vectorLayer = new VectorLayer({
+            const vectorLayer1 = new VectorLayer({
                 source: new VectorSource({
-                    features: new GeoJSON().readFeatures(geoJsonData),
+                    features: new GeoJSON().readFeatures(geoJsonData1),
                 }),
-                style: geoJsonStyle, // Aplicar el estilo
+                style: geoJsonStyle1,
+                title: "Municipios", // Título para LayerSwitcher
             });
 
-            // Crear la capa base (puedes usar OSM u otra)
+            // Estilo para la capa GeoJSON 2 (Regiones)
+            const geoJsonStyle2 = new Style({
+                fill: new Fill({
+                    color: "rgba(255, 255, 0, 0.3)", // Amarillo transparente
+                }),
+                stroke: new Stroke({
+                    color: "#ffff00", // Amarillo
+                    width: 3,
+                }),
+            });
+
+            const vectorLayer2 = new VectorLayer({
+                source: new VectorSource({
+                    features: new GeoJSON().readFeatures(geoJsonData2),
+                }),
+                style: geoJsonStyle2,
+                title: "Regiones", // Título para LayerSwitcher
+            });
+
             const baseLayer = new TileLayer({
                 source: new OSM(),
+                title: "OpenStreetMap", // Título para LayerSwitcher
             });
 
             const map = new Map({
                 target: mapDivId,
-                layers: [baseLayer, vectorLayer],
+                layers: [baseLayer, vectorLayer1, vectorLayer2], // Agregar ambas capas
                 view: new View({
-                    center: [-100, 20], //  Si son coordenadas geográficas
+                    center: [-100, 20],
                     zoom: 4,
-                    projection: "EPSG:4326", // Especificar la proyección
+                    projection: "EPSG:4326",
                 }),
             });
 
-            // Ajustar la vista una vez el mapa esté renderizado
+            // Layer Switcher
+            const layerSwitcher = new LayerSwitcher({
+                tipLabel: "Leyenda", // Optional label for the tip
+            });
+            map.addControl(layerSwitcher);
+
             map.once("rendercomplete", () => {
-                const extent = vectorLayer.getSource().getExtent();
-                map.getView().fit(extent, { padding: [50, 50, 50, 50] });
+                // Ajusta a la extensión combinada de ambas capas
+                const extent1 = vectorLayer1.getSource().getExtent();
+                const extent2 = vectorLayer2.getSource().getExtent();
+                const combinedExtent = extent1.concat(extent2);
+                map.getView().fit(combinedExtent, {
+                    padding: [50, 50, 50, 50],
+                });
             });
         })
         .catch((error) => {
