@@ -12,6 +12,7 @@ import { Fill, Stroke, Style } from "ol/style";
 import { useGeographic } from "ol/proj"; // Importar useGeographic
 // LayerSwitcher (asegúrate de tenerlo instalado: npm install ol-layerswitcher)
 import LayerSwitcher from "ol-layerswitcher";
+import * as turf from "@turf/turf";
 
 // Usar useGeographic() para coordenadas geográficas (longitud, latitud)
 useGeographic();
@@ -45,7 +46,17 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
 
     Promise.all([promesaGeoJSON1, promesaGeoJSON2])
         .then(([geoJsonData1, geoJsonData2]) => {
-            // Destructurar los resultados
+            // Simplificar la geometría del primer GeoJSON
+            const simplifiedGeoJSON1 = turf.simplify(geoJsonData1, {
+                tolerance: 0.001, // Ajusta este valor según la precisión deseada
+                highQuality: false, // 'true' para mayor precisión, pero más lento
+            });
+
+            // Simplificar la geometría del segundo GeoJSON
+            const simplifiedGeoJSON2 = turf.simplify(geoJsonData2, {
+                tolerance: 0.001, // Ajusta este valor según la precisión deseada
+                highQuality: false, // true para mayor precisión pero más lento
+            });
 
             // Estilo para la capa GeoJSON 1 (Municipios)
             const geoJsonStyle1 = new Style({
@@ -58,9 +69,10 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
                 }),
             });
 
+            // Usar la geometría simplificada para crear las capas
             const vectorLayer1 = new VectorLayer({
                 source: new VectorSource({
-                    features: new GeoJSON().readFeatures(geoJsonData1),
+                    features: new GeoJSON().readFeatures(simplifiedGeoJSON1), // Usar simplifiedGeoJSON1
                 }),
                 style: geoJsonStyle1,
                 title: "Municipios", // Título para LayerSwitcher
@@ -79,7 +91,7 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
 
             const vectorLayer2 = new VectorLayer({
                 source: new VectorSource({
-                    features: new GeoJSON().readFeatures(geoJsonData2),
+                    features: new GeoJSON().readFeatures(simplifiedGeoJSON2), // Usar simplifiedGeoJSON2
                 }),
                 style: geoJsonStyle2,
                 title: "Regiones", // Título para LayerSwitcher
