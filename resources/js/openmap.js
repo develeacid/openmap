@@ -133,7 +133,7 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
                 style: highlightStyle, // Usar el estilo highlightStyle para el hover
                 filter: (feature, layer) => {
                     //Filtrar la capa de municipio
-                    return layer === vectorLayer1;
+                    return layer === vectorLayer1 || layer === vectorLayer2;
                 },
             });
 
