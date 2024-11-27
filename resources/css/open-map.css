@@ -1,0 +1,9 @@
+/* resources/css/openmap.css */
+#map .ol-zoom {
+    left: 0.5em;
+    top: 0.5em;
+}
+
+#map .ol-zoom-single button {
+    margin: 0;
+}
