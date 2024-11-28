@@ -17,3 +17,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::view('openmap', 'map')->name('map');
+Route::view('openmapcomponent', 'mapcomponent')->name('mapcomponent');
