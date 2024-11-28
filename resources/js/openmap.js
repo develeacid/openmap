@@ -12,6 +12,8 @@ import { Fill, Stroke, Style } from "ol/style";
 import { useGeographic } from "ol/proj"; // Importar useGeographic
 // LayerSwitcher (asegúrate de tenerlo instalado: npm install ol-layerswitcher)
 import LayerSwitcher from "ol-layerswitcher";
+// Create this file for your custom styles
+import "../css/layerswitcher.css"; // Importa tu CSS aquí
 //suavisar poligonos
 import * as turf from "@turf/turf";
 //efecto hover
@@ -92,7 +94,11 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
             map.addInteraction(hoverInteraction);
 
             const layerSwitcher = new LayerSwitcher({
-                tipLabel: "Leyenda",
+                tipLabel: "Selector de Capas", // Texto de ayuda
+                title: '<div class="layer-switcher-title"><h2>Control de Capas</h2></div>', // Título personalizado
+                instructions:
+                    '<div class="layer-switcher-instructions"><p>Selecciona las capas que deseas mostrar.</p></div>', // Instrucciones
+                groupSelectStyle: "children", //o 'group'|'none'
             });
             map.addControl(layerSwitcher);
 

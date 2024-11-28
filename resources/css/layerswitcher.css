@@ -1,0 +1,81 @@
+.layer-switcher {
+    /* Estilo general del contenedor */
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra opcional */
+}
+
+.layer-switcher.shown {
+    /* Cambiar la apariencia cuando se muestra la lista de capas */
+}
+
+.layer-switcher-title {
+    /* Estilo del título */
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: bold; /* Negrita */
+}
+
+.layer-switcher-instructions {
+    /* Estilo de las instrucciones */
+    font-size: smaller;
+    color: gray;
+    margin-bottom: 10px;
+}
+
+/* Estilo para el LayerSwitcher. Los selectores .ol-layerswitcher-* ya existen en la librería */
+
+.layer-switcher .ol-layerswitcher-group {
+}
+
+.layer-switcher button {
+    /* Estilo de los botones de las capas */
+    width: 100%;
+    text-align: left; /* Alinea el texto a la izquierda */
+    padding: 5px 10px; /* Espaciado interno */
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Transición suave */
+}
+
+.layer-switcher button:hover {
+    /* Efecto hover */
+    background-color: #f0f0f0;
+}
+
+.layer-switcher button.active {
+    background-color: #e0f0ff; /* Color de fondo activo */
+
+    font-weight: bold;
+}
+
+.layer-switcher button.disabled {
+    /* Estilo para capas deshabilitadas*/
+}
+
+/* Estilos para el estado abierto/cerrado del grupo de capas */
+
+.layer-switcher .ol-layerswitcher-group > .ol-layerswitcher-buttons {
+    /* Todos los botones del grupo */
+}
+
+.layer-switcher
+    .ol-unselectable.ol-control.ol-collapsed
+    .ol-layerswitcher-group
+    > .ol-layerswitcher-buttons {
+    /* Botones ocultos cuando el grupo está colapsado */
+    display: none;
+}
+
+.layer-switcher button i {
+    margin-right: 10px; /* Ajusta la separación entre el ícono y el texto */
+}
+
+.group-header {
+    font-weight: bold; /* Negrita */
+    font-size: 1.1em; /* Tamaño de fuente ligeramente mayor */
+    padding-top: 10px; /* Espaciado superior */
+    margin-bottom: 5px; /* Espaciado inferior */
+}
