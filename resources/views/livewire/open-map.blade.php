@@ -11,7 +11,7 @@
 
     document.addEventListener('livewire:load', function () {
         if (!mapInitialized) {
-            inicializarMapa('map', '{{ asset('GeoJson/municipios/001.geojson') }}', '{{ asset('GeoJson/Municipios.json') }}'); // Pasar ambas URLs
+            inicializarMapa('map', '{{ asset('GeoJson/municipios/002.geojson') }}'); 
             mapInitialized = true;
         }
     });

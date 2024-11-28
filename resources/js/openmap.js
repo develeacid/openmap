@@ -21,7 +21,7 @@ import Select from "ol/interaction/Select";
 // Usar useGeographic() para coordenadas geográficas (longitud, latitud)
 useGeographic();
 
-window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
+window.inicializarMapa = function (mapDivId, geoJsonUrl) {
     // Asegurarse de que el contenedor del mapa tenga dimensiones
     const mapContainer = document.getElementById(mapDivId);
     if (!mapContainer) {
@@ -29,41 +29,16 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
         return; // Detener la ejecución si no se encuentra el contenedor
     }
 
-    // Promesas para cargar ambos archivos GeoJSON
-    const promesaGeoJSON1 = fetch(geoJsonUrl)
+    fetch(geoJsonUrl)
         .then((response) => response.json())
-        .catch((error) => {
-            console.error("Error cargando el primer GeoJSON:", error);
-            // Manejar el error, quizás mostrar un mensaje al usuario, etc.
-            // Puedes retornar un valor por defecto o lanzar el error para detener la ejecución
-            //  throw error; // Lanzar el error para detener Promise.all
-            return {}; // O retornar un objeto vacío para que Promise.all continúe
-        });
-
-    const promesaGeoJSON2 = fetch(geoJsonUrl2)
-        .then((response) => response.json())
-        .catch((error) => {
-            console.error("Error cargando el segundo GeoJSON:", error);
-            // Manejar el error similar al anterior
-            return {};
-        });
-
-    Promise.all([promesaGeoJSON1, promesaGeoJSON2])
-        .then(([geoJsonData1, geoJsonData2]) => {
-            // Simplificar la geometría del primer GeoJSON
-            const simplifiedGeoJSON1 = turf.simplify(geoJsonData1, {
-                tolerance: 0.001, // Ajusta este valor según la precisión deseada
-                highQuality: false, // 'true' para mayor precisión, pero más lento
+        .then((geoJsonData) => {
+            // Simplificar la geometría
+            const simplifiedGeoJSON = turf.simplify(geoJsonData, {
+                tolerance: 0.001,
+                highQuality: false,
             });
 
-            // Simplificar la geometría del segundo GeoJSON
-            const simplifiedGeoJSON2 = turf.simplify(geoJsonData2, {
-                tolerance: 0.001, // Ajusta este valor según la precisión deseada
-                highQuality: false, // true para mayor precisión pero más lento
-            });
-
-            // Estilo para la capa GeoJSON 1 (Municipios)
-            const geoJsonStyle1 = new Style({
+            const geoJsonStyle = new Style({
                 fill: new Fill({
                     color: "rgba(157, 36, 73, 0.5)",
                 }),
@@ -73,45 +48,25 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
                 }),
             });
 
-            // Usar la geometría simplificada para crear las capas
-            const vectorLayer1 = new VectorLayer({
+            const vectorLayer = new VectorLayer({
                 source: new VectorSource({
-                    features: new GeoJSON().readFeatures(simplifiedGeoJSON1), // Usar simplifiedGeoJSON1
+                    features: new GeoJSON().readFeatures(simplifiedGeoJSON),
                 }),
-                style: geoJsonStyle1,
+                style: geoJsonStyle,
                 title: "Municipios", // Título para LayerSwitcher
-            });
-
-            // Estilo para la capa GeoJSON 2 (Regiones)
-            const geoJsonStyle2 = new Style({
-                fill: new Fill({
-                    color: "rgba(255, 255, 0, 0.3)", // Amarillo transparente
-                }),
-                stroke: new Stroke({
-                    color: "#ffff00", // Amarillo
-                    width: 3,
-                }),
-            });
-
-            const vectorLayer2 = new VectorLayer({
-                source: new VectorSource({
-                    features: new GeoJSON().readFeatures(simplifiedGeoJSON2), // Usar simplifiedGeoJSON2
-                }),
-                style: geoJsonStyle2,
-                title: "Regiones", // Título para LayerSwitcher
             });
 
             const baseLayer = new TileLayer({
                 source: new OSM(),
-                title: "OpenStreetMap", // Título para LayerSwitcher
+                title: "OpenStreetMap",
             });
 
             const map = new Map({
                 target: mapDivId,
-                layers: [baseLayer, vectorLayer1, vectorLayer2], // Agregar ambas capas
+                layers: [baseLayer, vectorLayer], // Solo una capa vectorial
                 view: new View({
-                    center: [-100, 20],
-                    zoom: 4,
+                    center: [-100, 20], // Ajusta el centro inicial si es necesario
+                    zoom: 4, // Ajusta el zoom inicial si es necesario
                     projection: "EPSG:4326",
                 }),
             });
@@ -119,40 +74,31 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl, geoJsonUrl2) {
             // Estilo para el hover
             const highlightStyle = new Style({
                 fill: new Fill({
-                    color: "rgba(255, 0, 0, 0.3)", // Rojo transparente, ajusta el color a tu gusto
+                    color: "rgba(255, 0, 0, 0.3)",
                 }),
                 stroke: new Stroke({
-                    color: "#FF0000", // Rojo, ajusta el color a tu gusto
+                    color: "#FF0000",
                     width: 3,
                 }),
             });
 
-            // Crear una interacción de selección para el hover.  pointerMove activa la selección al pasar el ratón.
             const hoverInteraction = new Select({
                 condition: pointerMove,
-                style: highlightStyle, // Usar el estilo highlightStyle para el hover
+                style: highlightStyle,
                 filter: (feature, layer) => {
-                    //Filtrar la capa de municipio
-                    return layer === vectorLayer1 || layer === vectorLayer2;
+                    return layer === vectorLayer; // Filtra solo interacciones con vectorLayer.
                 },
             });
-
             map.addInteraction(hoverInteraction);
 
-            // Layer Switcher
             const layerSwitcher = new LayerSwitcher({
-                tipLabel: "Leyenda", // Optional label for the tip
+                tipLabel: "Leyenda",
             });
             map.addControl(layerSwitcher);
 
-            map.once("rendercomplete", () => {
-                // Ajusta a la extensión combinada de ambas capas
-                const extent1 = vectorLayer1.getSource().getExtent();
-                const extent2 = vectorLayer2.getSource().getExtent();
-                const combinedExtent = extent1.concat(extent2);
-                map.getView().fit(combinedExtent, {
-                    padding: [50, 50, 50, 50],
-                });
+            // Ajustar a la extensión de la capa cargada
+            map.getView().fit(vectorLayer.getSource().getExtent(), {
+                padding: [50, 50, 50, 50], // Ajusta el padding según sea necesario
             });
         })
         .catch((error) => {
