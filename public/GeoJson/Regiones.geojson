@@ -13,13 +13,13 @@
                 "CVEGEO": "20001",
                 "CVE_ENT": "20",
                 "CVE_MUN": "001",
-                "NOMGEO": "Abejones",
+                "NOMGEO": "PAPALOAPAM",
                 "NOM_ENT": "Oaxaca",
                 "COV_": 1137,
                 "COV_ID": 1337,
                 "AREA": 12636.5937844,
                 "PERIMETER": 68636.1971637,
-                "region": "SIERRA NORTE",
+                "region": "PPALOAPAM",
                 "distrito": "Desconocido"
             },
             "geometry": {
