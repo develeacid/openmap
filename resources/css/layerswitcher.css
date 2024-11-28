@@ -79,3 +79,10 @@
     padding-top: 10px; /* Espaciado superior */
     margin-bottom: 5px; /* Espaciado inferior */
 }
+
+.tooltip {
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px;
+    font-size: 12px;
+}

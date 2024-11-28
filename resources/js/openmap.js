@@ -19,6 +19,7 @@ import * as turf from "@turf/turf";
 //efecto hover
 import { pointerMove } from "ol/events/condition";
 import Select from "ol/interaction/Select";
+import Overlay from "ol/Overlay"; // Import the Overlay class
 
 // Usar useGeographic() para coordenadas geográficas (longitud, latitud)
 useGeographic();
@@ -71,6 +72,40 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
                     zoom: 4, // Ajusta el zoom inicial si es necesario
                     projection: "EPSG:4326",
                 }),
+            });
+
+            // Create an overlay element (the tooltip itself)
+            const tooltipElement = document.createElement("div");
+            tooltipElement.className = "tooltip"; // Add a CSS class for styling
+
+            const tooltipOverlay = new Overlay({
+                element: tooltipElement,
+                offset: [0, -15], // Offset from the pointer
+                positioning: "bottom-center", // Position relative to pointer
+            });
+            map.addOverlay(tooltipOverlay);
+
+            // Event listener for pointer move
+            map.on("pointermove", function (evt) {
+                const pixel = evt.pixel;
+                const feature = map.forEachFeatureAtPixel(
+                    pixel,
+                    function (feature) {
+                        return feature;
+                    }
+                );
+
+                if (feature) {
+                    const nomgeo = feature.get("NOMGEO"); // Get the NOMGEO property
+                    if (nomgeo) {
+                        tooltipElement.innerHTML = nomgeo;
+                        tooltipOverlay.setPosition(evt.coordinate);
+                    } else {
+                        tooltipOverlay.setPosition(undefined); // Hide if no NOMGEO
+                    }
+                } else {
+                    tooltipOverlay.setPosition(undefined); // Hide tooltip if no feature
+                }
             });
 
             // Estilo para el hover
