@@ -32,6 +32,8 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
         return; // Detener la ejecución si no se encuentra el contenedor
     }
 
+    let currentLayerType = "region"; // Controla el nivel de la capa: 'region' o 'municipio'
+
     fetch(geoJsonUrl)
         .then((response) => response.json())
         .then((geoJsonData) => {
@@ -73,6 +75,63 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
                     projection: "EPSG:4326",
                 }),
             });
+
+            // Manejar el evento de doble clic
+            map.on("dblclick", function (evt) {
+                const feature = map.forEachFeatureAtPixel(evt.pixel, (f) => f);
+                if (feature) {
+                    if (currentLayerType === "region") {
+                        const region = feature.get("region"); // Obtener la región
+                        if (region) {
+                            const newGeoJsonUrl = `/GeoJson/regionales/${region}.geojson`;
+                            loadNewLayer(
+                                newGeoJsonUrl,
+                                map,
+                                vectorLayer,
+                                "municipio"
+                            );
+                        }
+                    } else if (currentLayerType === "municipio") {
+                        const cveMun = feature.get("CVE_MUN"); // Obtener el municipio
+                        if (cveMun) {
+                            const newGeoJsonUrl = `/GeoJson/municipales/${cveMun}.geojson`;
+                            loadNewLayer(
+                                newGeoJsonUrl,
+                                map,
+                                vectorLayer,
+                                "detalle"
+                            );
+                        }
+                    }
+                }
+            });
+
+            // Función para cargar nuevas capas
+            function loadNewLayer(url, map, vectorLayer, nextLayerType) {
+                fetch(url)
+                    .then((response) => response.json())
+                    .then((newGeoJsonData) => {
+                        const newFeatures = new GeoJSON().readFeatures(
+                            newGeoJsonData
+                        );
+                        const source = new VectorSource({
+                            features: newFeatures,
+                        });
+                        vectorLayer.setSource(source); // Actualizar la fuente de la capa vectorial
+                        currentLayerType = nextLayerType; // Actualizar el tipo de capa actual
+
+                        // Ajustar la vista al nuevo contenido
+                        map.getView().fit(source.getExtent(), {
+                            padding: [50, 50, 50, 50],
+                        });
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Error cargando nueva capa GeoJSON:",
+                            error
+                        );
+                    });
+            }
 
             // Create an overlay element (the tooltip itself)
             const tooltipElement = document.createElement("div");
