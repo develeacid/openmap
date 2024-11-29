@@ -104,7 +104,23 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
                         }
                     }
                 }
+            });            // Función para obtener el nombre de la región y el identificador del municipio
+            function getRegionAndMunicipality(feature) {
+                const region = feature.get("region");
+                const cveMun = feature.get("CVE_MUN");
+                return { region, cveMun };
+            }
+
+            // Agregar un manejador de clic para mostrar la información en la consola
+            map.on("click", function (evt) {
+                const feature = map.forEachFeatureAtPixel(evt.pixel, (f) => f);
+                if (feature) {
+                    const { region, cveMun } = getRegionAndMunicipality(feature);
+                    console.log("Región:", region);
+                    console.log("CVE_MUN:", cveMun);
+                }
             });
+
 
             // Función para cargar nuevas capas
             function loadNewLayer(url, map, vectorLayer, nextLayerType) {
