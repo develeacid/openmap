@@ -1,9 +1,13 @@
 <div class="breadcrumb">
-    <span>OAXACA</span>
-    @if($region !== 'N/A')
-        / <span>{{ $region }}</span>
+    <span>
+        <a href="#" onclick="resetMapLayer(); return false;">OAXACA</a>
+    </span>
+    @if ($region && $region !== 'N/A')
+        / <span>
+            <a href="#" onclick="updateLayerToRegion('{{ $region }}'); return false;">{{ $region }}</a>
+        </span>
     @endif
-    @if($municipio !== 'N/A' && $municipio !== '000')
+    @if ($municipio && $municipio !== 'N/A' && $municipio !== '000')
         / <span>{{ $municipio }}</span>
     @endif
     <style>
@@ -14,6 +18,13 @@
         }
         .breadcrumb span {
             font-weight: bold;
+        }
+        .breadcrumb span a {
+            color: #9d2449;
+            text-decoration: none;
+        }
+        .breadcrumb span a:hover {
+            text-decoration: underline;
         }
     </style>
 </div>

@@ -83,6 +83,17 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
             .catch(error => console.error("Error cargando GeoJSON:", error));
     }
 
+    function resetToInitialLayer() {
+        const initialGeoJsonUrl = "/GeoJson/Regiones.geojson"; // Ruta de la capa inicial
+        loadGeoJson(initialGeoJsonUrl, "region");
+
+        // Emitir evento Livewire para actualizar el breadcrumb
+        window.livewire.emit('breadcrumbReset', { region: null, municipio: null });
+
+        console.log("Mapa restablecido a la capa inicial.");
+    }
+
+    window.resetMapLayer = resetToInitialLayer;
 
     //Encapsula la creación del mapa.
     function createMap(mapDivId, vectorLayer) {

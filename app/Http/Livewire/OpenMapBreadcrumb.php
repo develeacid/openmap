@@ -9,12 +9,18 @@ class OpenMapBreadcrumb extends Component
     public $region = 'N/A';
     public $municipio = 'N/A';
 
-    protected $listeners = ['mapClick' => 'updateBreadcrumb'];
+    protected $listeners = ['mapClick' => 'updateBreadcrumb' , 'breadcrumbReset'];
 
     public function updateBreadcrumb($data)
     {
         $this->region = $data['region'];
         $this->municipio = $data['cveMun'];
+    }
+
+    public function breadcrumbReset()
+    {
+        $this->region = null;
+        $this->municipio = null;
     }
     
     public function render()
