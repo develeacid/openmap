@@ -1,4 +1,5 @@
 <div>
+  <livewire:open-map-breadcrumb />
     <div id="map-{{ $mapId }}" style="height: 400px; width: 100%;"></div>
 
     <script>
