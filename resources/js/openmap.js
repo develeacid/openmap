@@ -148,15 +148,45 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
         });
         map.addOverlay(tooltipOverlay);
 
+        // Elemento div fuera del mapa para mostrar la información
+        const infoDiv = document.createElement("div");
+        infoDiv.id = "feature-info";
+        infoDiv.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid gray;
+        z-index: 100;
+        font-size: 12px; // Tamaño de letra más pequeño
+    `;
+
+        mapContainer.parentNode.appendChild(infoDiv); // Agregar el div al contenedor padre del mapa
+
         map.on("pointermove", (evt) => {
-            const feature = map.forEachFeatureAtPixel(evt.pixel, (f) => f);
+            const feature = map.forEachFeatureAtPixel(evt.pixel, (f, layer) => {
+                if (layer === vectorLayer) {
+                    return f;
+                }
+            });
+
             if (feature) {
+                // Mostrar NOMGEO en el tooltip
                 tooltipElement.innerHTML = feature.get("NOMGEO") || "";
                 tooltipOverlay.setPosition(
                     feature.getGeometry() ? evt.coordinate : undefined
                 );
+
+                // Mostrar todas las propiedades en el div externo
+                const properties = feature.getProperties();
+                const infoText = Object.entries(properties)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join("<br>");
+                infoDiv.innerHTML = infoText;
             } else {
                 tooltipOverlay.setPosition(undefined);
+                infoDiv.innerHTML = "";
             }
         });
 
