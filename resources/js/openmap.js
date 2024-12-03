@@ -242,4 +242,23 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
     }
 
     window.resetMapLayer = resetToInitialLayer;
+
+    function resetToRegionLayer(region) {
+        // Construir la URL del archivo GeoJSON para la región seleccionada
+        const geoJsonUrl = `/GeoJson/regionales/${region}.geojson`;
+
+        // Llamar a la función loadGeoJson para cargar la capa del mapa correspondiente a la región
+        loadGeoJson(geoJsonUrl, "region");
+
+        // Emitir evento Livewire para restablecer el breadcrumb
+        window.livewire.emit("breadcrumbReset", {
+            region: region,
+            municipio: null,
+        });
+
+        console.log(`Mapa restablecido a la capa de la región: ${region}`);
+    }
+
+    // Asignamos la función al objeto global para que se pueda llamar desde el HTML
+    window.resetMapLayerRegion = resetToRegionLayer;
 };

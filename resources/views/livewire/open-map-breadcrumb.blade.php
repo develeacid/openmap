@@ -4,7 +4,7 @@
     </span>
     @if ($region && $region !== 'N/A')
         / <span>
-            <a href="#" onclick="updateLayerToRegion('{{ $region }}'); return false;">{{ $region }}</a>
+            <a href="#" onclick="resetMapLayerRegion('{{ $region }}'); return false;">{{ $region }}</a>
         </span>
     @endif
     @if ($municipio && $municipio !== 'N/A' && $municipio !== '000')
