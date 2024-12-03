@@ -205,6 +205,11 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
             const cveMun = feature.get("CVE_MUN");
             window.livewire.emit("mapClick", { region, cveMun });
             console.log("Región:", region, "CVE_MUN:", cveMun);
+            // Agregar los datos del polígono para actualizar la gráfica
+            const nomgeo = feature.get("NOMGEO");
+            const area = feature.get("AREA");
+            const perimeter = feature.get("PERIMETER");
+            updateChart(nomgeo, area, perimeter); // Actualiza la gráfica con los nuevos datos
         }
     }
 
@@ -261,4 +266,59 @@ window.inicializarMapa = function (mapDivId, geoJsonUrl) {
 
     // Asignamos la función al objeto global para que se pueda llamar desde el HTML
     window.resetMapLayerRegion = resetToRegionLayer;
+    // Función para actualizar la gráfica
+    function updateChart(nomgeo, area, perimeter) {
+        const ctx = document.getElementById("chart").getContext("2d");
+
+        const chartData = {
+            labels: ["Área", "Perímetro"],
+            datasets: [
+                {
+                    label: nomgeo,
+                    data: [area, perimeter],
+                    backgroundColor: [
+                        "rgba(54, 162, 235, 0.2)",
+                        "rgba(255, 99, 132, 0.2)",
+                    ],
+                    borderColor: [
+                        "rgba(54, 162, 235, 1)",
+                        "rgba(255, 99, 132, 1)",
+                    ],
+                    borderWidth: 1,
+                },
+            ],
+        };
+
+        const chartOptions = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "top",
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            return (
+                                tooltipItem.dataset.label +
+                                ": " +
+                                tooltipItem.raw.toFixed(2)
+                            );
+                        },
+                    },
+                },
+            },
+        };
+
+        // Verificar si ya existe una instancia de Chart
+        if (window.chart instanceof Chart) {
+            window.chart.destroy(); // Destruir la gráfica anterior si existe
+        }
+
+        // Crear o actualizar la gráfica
+        window.chart = new Chart(ctx, {
+            type: "bar",
+            data: chartData,
+            options: chartOptions,
+        });
+    }
 };

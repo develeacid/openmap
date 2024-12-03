@@ -14,5 +14,8 @@
             :zoom="4" 
             :breadcrumb="true" /> <!-- Este estilo asegura que el mapa ocupe el 100% del contenedor -->
     </div>
+    <div class="col-md-6">
+        <canvas id="chart"></canvas>
+    </div>
 </div>
 @endsection
