@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Aplicación de OpenMap</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/css/openmap.css', 'resources/js/openmap.js'])
+    @vite(['resources/css/app.scss', 'resources/js/app.js'])
     @livewireStyles
 </head>
 <body>
