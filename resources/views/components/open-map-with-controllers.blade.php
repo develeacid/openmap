@@ -19,4 +19,7 @@
     {{-- Componente de botón para restablecer el mapa a su estado inicial --}}
     <x-open-map-button-reset />
 
+    <!-- Incluir el componente Livewire para mostrar la información -->
+        <livewire:open-map-analisis-municipal />
+
 </div>
